@@ -1,3 +1,5 @@
+## Aktivieren von SSH und Telnet mit root Zugang für den Flashforge Adventure 5M Pro
+
 1. Formatiert einen USB Stick mit FAT32
 2. Kopiert alle Daten aus dem Repo auf einen USB Stick
 3. Schaltet den Drucker ab
