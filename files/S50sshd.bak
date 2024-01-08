@@ -1,0 +1,90 @@
+#!/bin/sh
+#
+# sshd        Starts sshd.
+#
+
+# Make sure the ssh-keygen progam exists
+[ -f /usr/bin/ssh-keygen ] || exit 0
+
+umask 077
+
+start() {
+	# Create any missing keys
+	/bin/ssh-keygen -A
+
+	
+	/bin/sshd
+	touch /run/sshd
+	echo "OK"
+}
+stop() {
+	
+	killall sshd
+	rm -f /run/sshd
+	echo "OK"
+}
+restart() {
+	stop
+	start
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	restart
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
+
+
+
+#!/bin/sh
+#
+# Start telnet....
+#
+
+SSHD_ARGS=-F
+[ -r /etc/default/sshd ] && . /etc/default/sshd
+
+start() {
+      printf "Starting sshd: "
+	  /bin/ssh-keygen -A
+      start-stop-daemon -S -q -m -b -p /var/run/sshd.pid \
+                        -x /bin/sshd -- $SSHD_ARGS
+      [ $? = 0 ] && echo "OK" || echo "FAIL"
+}
+
+stop() {
+        printf "Stopping sshd: "
+        start-stop-daemon -K -q -p /var/run/sshd.pid \
+                          -x /bin/sshd
+        [ $? = 0 ] && echo "OK" || echo "FAIL"
+		killall sshd
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart|reload)
+        stop
+        start
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?

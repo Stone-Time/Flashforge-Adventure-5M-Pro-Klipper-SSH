@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# Start telnet....
+#
+
+SSHD_ARGS=-F
+[ -r /etc/default/sshd ] && . /etc/default/sshd
+
+start() {
+    printf "Starting sshd: "
+	killall sshd
+    /bin/ssh-keygen -A
+	/bin/sshd
+    [ $? = 0 ] && echo "OK" || echo "FAIL"
+}
+
+stop() {
+    printf "Stopping sshd: "
+    killall sshd
+    echo "OK"
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart|reload)
+        stop
+        start
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?
